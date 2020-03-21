@@ -1,5 +1,6 @@
 package com.protal;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -83,7 +84,8 @@ public class LoginFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            //TODO: Proceed to main homepage
+                            startActivity(new Intent(getActivity(), MainHomePageActivity.class));
+                            getActivity().finish();
                             Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
                             pbLoadingLogin.setVisibility(View.GONE);
                             tvLoginError.setVisibility(View.GONE);

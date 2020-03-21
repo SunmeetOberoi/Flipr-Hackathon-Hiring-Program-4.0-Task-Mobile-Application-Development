@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.google.firebase.auth.FirebaseAuth;
 
 public class HomePageActivity extends AppCompatActivity {
 
@@ -42,6 +45,11 @@ public class HomePageActivity extends AppCompatActivity {
                 .withEndAction(new Runnable() {
                     @Override
                     public void run() {
+                        if(FirebaseAuth.getInstance().getCurrentUser() != null) {
+                            startActivity(new Intent(HomePageActivity.this,
+                                    MainHomePageActivity.class));
+                            HomePageActivity.this.finish();
+                        }
                         // status bar is black for lower versions : tested on nexus S
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                             // reset the color of status bar

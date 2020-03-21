@@ -20,4 +20,18 @@
     <string name="empty_confirm_password_error">Please Re-enter your password</string>
     <string name="password_diff_error">Passwords do not match, retry!</string>
     <string name="confirm_email_message">A confirmation link has been sent to your email.</string>
+    <string name="title_activity_main_home_page">MainHomePage</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+
+    <string name="home_second">Home Second</string>
+    <string name="nav_logout">Logout</string>
 </resources>
