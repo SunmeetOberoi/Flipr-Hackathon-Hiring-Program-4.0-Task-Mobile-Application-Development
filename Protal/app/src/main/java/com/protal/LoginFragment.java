@@ -2,6 +2,7 @@ package com.protal;
 
 import androidx.lifecycle.ViewModelProviders;
 
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCanceledListener;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -62,11 +64,24 @@ public class LoginFragment extends Fragment {
             }
         });
 
-        // TODO: Forgot Password
         btnForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                if(etEMailLogin.getText().toString().trim().isEmpty()) {
+                    tvLoginError.setText(R.string.empty_email_error);
+                    tvLoginError.setVisibility(View.VISIBLE);
+                }
+                else {
+                    FirebaseAuth.getInstance().sendPasswordResetEmail(etEMailLogin.getText()
+                            .toString().trim()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            tvLoginError.setText(R.string.forgot_pass_success);
+                            tvLoginError.setTextColor(getResources().getColor(R.color.colorPrimary));
+                            tvLoginError.setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
             }
         });
         return view;
@@ -82,11 +97,12 @@ public class LoginFragment extends Fragment {
                             //TODO: Login
                             Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
                             pbLoadingLogin.setVisibility(View.GONE);
+                            tvLoginError.setVisibility(View.GONE);
+                            pbLoadingLogin.setVisibility(View.GONE);
                         }
                         else{
                             tvLoginError.setText(task.getException().getLocalizedMessage());
                             tvLoginError.setVisibility(View.VISIBLE);
-                            pbLoadingLogin.setVisibility(View.GONE);
                         }
                     }
                 });

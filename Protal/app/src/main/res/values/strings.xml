@@ -12,4 +12,5 @@
     <string name="btn_login">Login</string>
     <string name="empty_email_error">Enter E-mail</string>
     <string name="empty_password_error">Enter Password</string>
+    <string name="forgot_pass_success">A password reset link has been sent to your email address</string>
 </resources>
