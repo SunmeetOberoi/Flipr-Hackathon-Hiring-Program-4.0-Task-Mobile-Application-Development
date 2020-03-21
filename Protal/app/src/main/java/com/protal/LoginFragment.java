@@ -86,7 +86,6 @@ public class LoginFragment extends Fragment {
                         if (task.isSuccessful()) {
                             startActivity(new Intent(getActivity(), MainHomePageActivity.class));
                             getActivity().finish();
-                            Toast.makeText(getActivity(), "Success", Toast.LENGTH_SHORT).show();
                             pbLoadingLogin.setVisibility(View.GONE);
                             tvLoginError.setVisibility(View.GONE);
                             pbLoadingLogin.setVisibility(View.GONE);

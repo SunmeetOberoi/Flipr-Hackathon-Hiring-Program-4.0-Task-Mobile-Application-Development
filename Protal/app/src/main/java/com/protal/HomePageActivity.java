@@ -63,10 +63,6 @@ public class HomePageActivity extends AppCompatActivity {
                                 R.drawable.ic_gradient_background_homepage));
 
                         findViewById(R.id.tvNameHome).setVisibility(View.VISIBLE);
-                        // fade-in container
-//                        llLoginRegisterContainer.setAlpha(0);
-//                        llLoginRegisterContainer.setVisibility(View.VISIBLE);
-//                        llLoginRegisterContainer.animate().alpha(1).setDuration(500).start();
                         showFragment(ContainerFragment.class);
                     }
                 })
