@@ -1,3 +1,6 @@
 <resources>
-    <string name="app_name">Protal</string>
+    <string name="app_name">ProTal</string>
+    <string name="contentD_name">Name</string>
+    <string name="contentD_logo">Logo</string>
+    <string name="contentD_background">Background</string>
 </resources>
