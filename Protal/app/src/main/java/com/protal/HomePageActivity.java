@@ -2,6 +2,8 @@ package com.protal;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.animation.ObjectAnimator;
 import android.graphics.Color;
@@ -27,6 +29,7 @@ public class HomePageActivity extends AppCompatActivity {
         final ImageView ivCompanyLogo = findViewById(R.id.ivCompanyLogo);
         final LinearLayout llLoginRegisterContainer = findViewById(R.id.llLoginRegisterContainer);
 
+        // intro animation attributes
         final float Y_OFFSET = -2000f;
         int ANIMATION_START_DELAY = 2500;
         int ANIMATION_DURATION = 1000;
@@ -52,15 +55,44 @@ public class HomePageActivity extends AppCompatActivity {
                                 R.drawable.ic_gradient_background_homepage));
 
                         findViewById(R.id.tvNameHome).setVisibility(View.VISIBLE);
-                        llLoginRegisterContainer.setAlpha(0);
-                        llLoginRegisterContainer.setVisibility(View.VISIBLE);
-                        llLoginRegisterContainer.animate().alpha(1).setDuration(500).start();
-
+                        // fade-in container
+//                        llLoginRegisterContainer.setAlpha(0);
+//                        llLoginRegisterContainer.setVisibility(View.VISIBLE);
+//                        llLoginRegisterContainer.animate().alpha(1).setDuration(500).start();
+                        showFragment(ContainerFragment.class);
                     }
                 })
                 .start();
 
 
+
+    }
+
+    private void showFragment(Class fragmentclass) {
+
+        Fragment fragment = null;
+
+        try {
+            fragment = (Fragment) fragmentclass.newInstance();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            if(fragmentclass == ContainerFragment.class){
+                fragmentManager.beginTransaction()
+                        .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+                        .replace(R.id.rlFragmentHome, fragment)
+                        .commit();
+            }
+            else{
+                fragmentManager.beginTransaction()
+                        .setCustomAnimations(R.anim.fade_in, R.anim.fade_out)
+                        .replace(R.id.rlFragmentHome, fragment)
+                        .addToBackStack(null)
+                        .commit();
+            }
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
 
     }
 }
