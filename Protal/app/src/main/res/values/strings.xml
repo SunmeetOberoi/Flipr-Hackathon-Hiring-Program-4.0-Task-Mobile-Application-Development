@@ -13,4 +13,11 @@
     <string name="empty_email_error">Enter E-mail</string>
     <string name="empty_password_error">Enter Password</string>
     <string name="forgot_pass_success">A password reset link has been sent to your email address</string>
+    <string name="et_hint_confirm_password">Confirm Password</string>
+    <string name="et_hint_name">Name</string>
+    <string name="btn_register">Register</string>
+    <string name="empty_name_error">Enter Name</string>
+    <string name="empty_confirm_password_error">Please Re-enter your password</string>
+    <string name="password_diff_error">Passwords do not match, retry!</string>
+    <string name="confirm_email_message">A confirmation link has been sent to your email.</string>
 </resources>

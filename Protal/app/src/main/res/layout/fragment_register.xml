@@ -6,7 +6,6 @@
     tools:context=".RegisterFragment">
 
     <LinearLayout
-        android:id="@+id/llLoginRegisterContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30dp"
@@ -15,54 +14,62 @@
         android:orientation="vertical"
         android:padding="20dp"
         android:visibility="visible">
+
+        <EditText
+            android:id="@+id/etNameRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/et_hint_name"
+            android:inputType="textPersonName" />
+
+        <EditText
+            android:id="@+id/etEMailRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/et_hint_e_mail"
+            android:inputType="textEmailAddress" />
+
+        <EditText
+            android:id="@+id/etPasswordRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/et_hint_password"
+            android:inputType="textPassword" />
+
+        <EditText
+            android:id="@+id/etPasswordConfirmRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/et_hint_confirm_password"
+            android:inputType="textPassword" />
+
         <Button
+            android:id="@+id/btnRegisterSubmit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
-            android:text="Login"
             android:background="@color/colorPrimaryDark"
-            android:textColor="@android:color/white"
+            android:text="@string/btn_register"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            android:textColor="@android:color/white"
             android:textStyle="bold" />
 
-        <LinearLayout
+        <ProgressBar
+            android:id="@+id/pbLoadingRegister"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="10dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvRegisterError"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_gravity="center"
-                android:layout_weight="5"
-                android:background="#000"
-                android:layout_margin="5dp"/>
+            android:gravity="center"
+            android:text="Error"
+            android:textColor="@android:color/holo_red_light"
+            android:visibility="gone" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textAlignment="center"
-                android:layout_weight="1"
-                android:text="or" />
-            <View
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_gravity="center"
-                android:layout_weight="5"
-                android:background="#000"
-                android:layout_margin="5dp"/>
-        </LinearLayout>
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="20dp"
-            android:text="Login"
-            android:background="@color/colorPrimaryDark"
-            android:textColor="@android:color/white"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            android:textStyle="bold" />
     </LinearLayout>
-
-
 </FrameLayout>
