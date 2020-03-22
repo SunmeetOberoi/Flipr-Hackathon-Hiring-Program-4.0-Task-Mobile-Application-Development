@@ -4,8 +4,6 @@
     <string name="contentD_logo">Logo</string>
     <string name="contentD_background">Background</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="et_hint_e_mail">E-mail</string>
     <string name="et_hint_password">Password</string>
     <string name="forgot_password">Forgot Password?</string>

@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -21,10 +22,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserInfo;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.firestore.auth.User;
 import com.protal.R;
 
 import androidx.annotation.NonNull;
@@ -129,30 +132,6 @@ public class MainHomePageActivity extends AppCompatActivity {
                     Toast.makeText(MainHomePageActivity.this, "Success", Toast.LENGTH_SHORT).show();
             }
         });
-
-//        FirebaseFirestore.getInstance().collection("Boards")
-//                .add(board)
-//                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//                    @Override
-//                    public void onSuccess(DocumentReference documentReference) {
-//                        FirebaseFirestore.getInstance().collection("Users")
-//                                .document(FirebaseAuth.getInstance().getCurrentUser().getUid())
-//                                .collection("Boards").document(documentReference.getId())
-//                                .set(new HashMap<String, Object>(){{put("Archived", false);}})
-//                                .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                                    @Override
-//                                    public void onSuccess(Void aVoid) {
-//                                        Toast.makeText(MainHomePageActivity.this, "Success", Toast.LENGTH_SHORT).show();
-//                                    }
-//                                });
-//                    }
-//                })
-//                .addOnFailureListener(new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        Log.e("FirebaseError", e.toString());
-//                    }
-//                });
     }
 
     @Override
@@ -165,6 +144,10 @@ public class MainHomePageActivity extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        // customize navigation bar
+        UserInfo user = FirebaseAuth.getInstance().getCurrentUser();
+        ((TextView) findViewById(R.id.tvNavBarDisplayName)).setText(user.getDisplayName());
+        ((TextView) findViewById(R.id.tvNavBarEMail)).setText(user.getEmail());
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
