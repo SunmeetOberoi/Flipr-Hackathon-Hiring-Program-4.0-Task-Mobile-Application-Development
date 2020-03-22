@@ -34,4 +34,9 @@
 
     <string name="home_second">Home Second</string>
     <string name="nav_logout">Logout</string>
+    <string name="nav_menu_team_boards">Team Boards</string>
+    <string name="nav_menu_personal_boards">Personal Boards</string>
+    <string name="et_add_board_dialog_name">Name</string>
+    <string name="et_add_board_dialog_title">Enter Boards Info</string>
+    <string name="tv_add_board_dialog_board_type">Board Type</string>
 </resources>

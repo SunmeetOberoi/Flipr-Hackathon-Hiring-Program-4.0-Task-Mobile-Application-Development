@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.protal.ui.home.HomeFragment"
+        android:name="com.protal.fragments.HomeBoardsFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home">
+        tools:layout="@layout/fragment_home_boards">
 
         <action
             android:id="@+id/action_HomeFragment_to_HomeSecondFragment"
@@ -30,14 +30,14 @@
     </fragment>
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.protal.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
+        android:id="@+id/nav_personal"
+        android:name="com.protal.fragments.PersonalBoardsFragment"
+        android:label="@string/nav_menu_personal_boards"
+        tools:layout="@layout/fragment_personal_boards" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.protal.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
+        android:id="@+id/nav_team"
+        android:name="com.protal.fragments.TeamBoardsFragment"
+        android:label="@string/nav_menu_team_boards"
+        tools:layout="@layout/fragment_team_boards" />
 </navigation>
