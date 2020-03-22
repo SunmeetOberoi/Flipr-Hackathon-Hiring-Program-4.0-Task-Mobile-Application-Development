@@ -29,6 +29,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.firestore.auth.User;
 import com.protal.R;
+import com.protal.fragments.PersonalBoardsFragment;
 
 import androidx.annotation.NonNull;
 import androidx.navigation.NavController;
@@ -78,9 +79,9 @@ public class MainHomePageActivity extends AppCompatActivity {
                         .setPositiveButton("Add", new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
                                 // Get user input and set it to result
-
-                                insertBoard(etAddBoardDialogName.getText().toString(),
-                                        spBoardType.getSelectedItem().toString());
+                                if(!etAddBoardDialogName.getText().toString().trim().isEmpty())
+                                    insertBoard(etAddBoardDialogName.getText().toString(),
+                                            spBoardType.getSelectedItem().toString());
 
                             }
                         }).create()
@@ -100,7 +101,7 @@ public class MainHomePageActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
     }
 
-    private void insertBoard(String name, String type) {
+    private void insertBoard(final String name, String type) {
 
         Map<String, Object> boardsMembers = new HashMap<>();
         boardsMembers.put(FirebaseAuth.getInstance().getCurrentUser().getUid(), null);
@@ -113,12 +114,20 @@ public class MainHomePageActivity extends AppCompatActivity {
 
         WriteBatch batch = db.batch();
 
-        DocumentReference boardFieldsRef = db.collection("Boards").document();
+        final DocumentReference boardFieldsRef = db.collection("Boards").document();
         batch.set(boardFieldsRef, board);
 
         DocumentReference todoRef = db.collection("Boards").document(
                 boardFieldsRef.getId()).collection("Lists").document("To-Do");
         batch.set(todoRef, new HashMap<>());
+
+        DocumentReference doingRef = db.collection("Boards").document(
+                boardFieldsRef.getId()).collection("Lists").document("Doing");
+        batch.set(doingRef, new HashMap<>());
+
+        DocumentReference doneRef = db.collection("Boards").document(
+                boardFieldsRef.getId()).collection("Lists").document("Done");
+        batch.set(doneRef, new HashMap<>());
 
         DocumentReference userRef = db.collection("Users").document(FirebaseAuth
                 .getInstance().getCurrentUser().getUid()).collection("Boards")
@@ -128,10 +137,12 @@ public class MainHomePageActivity extends AppCompatActivity {
         batch.commit().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful())
+                if (task.isSuccessful()) {
                     Toast.makeText(MainHomePageActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                }
             }
         });
+
     }
 
     @Override
