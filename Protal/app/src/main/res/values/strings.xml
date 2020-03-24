@@ -35,7 +35,7 @@
     <string name="nav_menu_team_boards">Team Boards</string>
     <string name="nav_menu_personal_boards">Personal Boards</string>
     <string name="et_add_board_dialog_name">Name</string>
-    <string name="et_add_board_dialog_title">Enter Boards Info</string>
+    <string name="tv_add_board_dialog_title">Enter Boards Info</string>
     <string name="tv_add_board_dialog_board_type">Board Type</string>
     <string name="title_activity_boards">BoardsActivity</string>
     <!-- Strings used for fragments for navigation -->
@@ -46,4 +46,5 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="tv_enter_card_info_title">Enter Card Info</string>
 </resources>

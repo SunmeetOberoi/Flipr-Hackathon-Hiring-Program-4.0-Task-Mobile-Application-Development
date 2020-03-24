@@ -28,7 +28,15 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textSize="20sp"
+            android:gravity="center"
             android:text="List Title"/>
+
+        <ImageView
+            android:id="@+id/ivAddCard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_add"
+            android:tint="@color/colorPrimaryDark"/>
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

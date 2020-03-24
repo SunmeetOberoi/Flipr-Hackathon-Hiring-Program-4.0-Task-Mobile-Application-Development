@@ -1,16 +1,16 @@
 package com.protal.activities;
 
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,45 +19,42 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.core.util.Pair;
 import androidx.core.view.ViewCompat;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.Transaction;
 import com.protal.R;
 import com.protal.adapters.ItemAdapter;
 import com.woxthebox.draglistview.BoardView;
 import com.woxthebox.draglistview.ColumnProperties;
 import com.woxthebox.draglistview.DragItem;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.function.Function;
 
 public class BoardsActivity extends AppCompatActivity {
 
     private BoardView mBoardView;
     Map<String, List<Map<String, String>>> lists = new HashMap<>();
+    private static int sCreatedItems = 0;
 
     //TODO: add new card by clicking header
 
@@ -77,7 +74,7 @@ public class BoardsActivity extends AppCompatActivity {
         mBoardView.setColumnSnapPosition(BoardView.ColumnSnapPosition.CENTER);
         mBoardView.clearBoard();
         mBoardView.setCustomDragItem(new MyDragItem(this, R.layout.column_item));
-        mBoardView.setCustomColumnDragItem(new MyColumnDragItem(this, R.layout.column_drag_layout));
+//        mBoardView.setCustomColumnDragItem(new MyColumnDragItem(this, R.layout.column_drag_layout));
 
         mBoardView.setBoardListener(new BoardView.BoardListener() {
             @Override
@@ -154,7 +151,7 @@ public class BoardsActivity extends AppCompatActivity {
                                 lists.put(ListName, l);
                             }
                         }
-                        createLists(lists);
+                        lists = createLists(lists);
                     }
                 });
                 //TODO: DELETE
@@ -186,24 +183,24 @@ public class BoardsActivity extends AppCompatActivity {
         });
     }
 
-    private void createLists(Map<String, List<Map<String, String>>> lists) {
+    private Map<String, List<Map<String, String>>> createLists(Map<String, List<Map<String, String>>> lists) {
         mBoardView.clearBoard();
+        sCreatedItems = 0;
         Map<String, List<Map<String, String>>> sortedMap = new TreeMap<>(Collections.reverseOrder());
         sortedMap.putAll(lists);
         for (Map.Entry<String, List<Map<String, String>>> m : sortedMap.entrySet()) {
-            addColumn(m.getKey());
+            addColumn(m.getKey(), m.getValue());
         }
-        addColumn("Add New +");
+        addColumn("Add New", null);
+        return sortedMap;
     }
-    private static int sCreatedItems = 0;
 
-    private void addColumn(String name) {
+    private void addColumn(String name, List<Map<String, String>> cards) {
         final ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
         if(!name.equals("Add New")) {
-            int addItems = 15;
-            for (int i = 0; i < addItems; i++) {
+            for (Map<String, String> card : cards) {
                 long id = sCreatedItems++;
-                mItemArray.add(new Pair<>(id, "Item " + id));
+                mItemArray.add(new Pair<>(id, card.get("title")));
             }
         }
 
@@ -212,12 +209,30 @@ public class BoardsActivity extends AppCompatActivity {
         ((TextView) header.findViewById(R.id.tvTitle)).setText(name);
         header.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 //TODO: will open a dialog for name
+                LayoutInflater li = LayoutInflater.from(BoardsActivity.this);
+                View dialogView = li.inflate(R.layout.dialog_get_card_name, null);
 
-                long id = mItemArray.size();
-                Pair item = new Pair<>(id, "Test " + id);
-                mBoardView.addItem(mBoardView.getColumnOfHeader(v), 0, item, true);
+                final EditText etAddCardDialogName = dialogView.findViewById(R.id.etAddCardDialogName);
+
+                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(BoardsActivity.this);
+                alertDialogBuilder.setView(dialogView);
+                alertDialogBuilder
+                        .setCancelable(true)
+                        .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // Get user input and set it to result
+                                if(!etAddCardDialogName.getText().toString().trim().isEmpty()) {
+                                    insertCard(etAddCardDialogName.getText().toString(),
+                                            lists.keySet().toArray()[mBoardView.getColumnOfHeader(v)].toString());
+                                    long id2 = mItemArray.size();
+                                    Pair item = new Pair<>(id2, etAddCardDialogName.getText().toString());
+                                    mBoardView.addItem(mBoardView.getColumnOfHeader(v), 0, item, true);
+                                }
+                            }
+                        }).create()
+                        .show();
             }
         });
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -230,6 +245,19 @@ public class BoardsActivity extends AppCompatActivity {
                 .build();
 
         mBoardView.addColumn(columnProperties);
+    }
+
+    private void insertCard(final String cardName, String ListName) {
+        FirebaseFirestore.getInstance().collection("Boards").document(
+                getIntent().getStringExtra("id")).collection("Lists")
+                .document(ListName).collection("Cards")
+                .add(new HashMap<String, String>(){{put("title", cardName);}})
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(BoardsActivity.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void add_to_database(String name) {
