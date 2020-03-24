@@ -66,6 +66,7 @@ public class PersonalBoardsFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Intent intent = new Intent(getActivity(), BoardsActivity.class);
                 intent.putExtra("id", BoardIdList.get(position));
+                intent.putExtra("name", BoardNamesList.get(position));
                 startActivity(intent);
             }
         });
@@ -105,7 +106,6 @@ public class PersonalBoardsFragment extends Fragment {
                         public List<String> apply(@NonNull Transaction transaction)
                                 throws FirebaseFirestoreException {
 
-                            //TODO: check for not archived
                             DocumentSnapshot snapshot;
                             List<String> temp = new ArrayList<>();
                             for(String id : BoardIdList) {
@@ -120,7 +120,7 @@ public class PersonalBoardsFragment extends Fragment {
                         @Override
                         public void onSuccess(List<String> stringList) {
                             BoardNamesList.clear();
-                            BoardNamesList.addAll(stringList);
+                                BoardNamesList.addAll(stringList);
                             listAdapter.notifyDataSetChanged();
                             pbLoadingPersonalBoards.setVisibility(View.GONE);
                         }

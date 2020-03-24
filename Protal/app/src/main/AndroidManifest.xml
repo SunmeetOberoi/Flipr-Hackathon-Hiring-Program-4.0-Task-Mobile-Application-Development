@@ -12,11 +12,11 @@
         <activity
             android:name=".activities.BoardsActivity"
             android:label="@string/title_activity_boards"
-            android:theme="@style/AppTheme.NoActionBar.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".activities.MainHomePageActivity"
             android:label="@string/title_activity_main_home_page"
-            android:theme="@style/AppTheme.NoActionBar.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".activities.HomePageActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

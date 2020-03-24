@@ -99,7 +99,13 @@ public class MainHomePageActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        UserInfo user = FirebaseAuth.getInstance().getCurrentUser();
+        ((TextView) navigationView.getHeaderView(0).findViewById(R.id.tvNavBarDisplayName)).setText(user.getDisplayName());
+        ((TextView) navigationView.getHeaderView(0).findViewById(R.id.tvNavBarEMail)).setText(user.getEmail());
     }
+
+
 
     private void insertBoard(final String name, String type) {
 
@@ -156,9 +162,7 @@ public class MainHomePageActivity extends AppCompatActivity {
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         // customize navigation bar
-        UserInfo user = FirebaseAuth.getInstance().getCurrentUser();
-        ((TextView) findViewById(R.id.tvNavBarDisplayName)).setText(user.getDisplayName());
-        ((TextView) findViewById(R.id.tvNavBarEMail)).setText(user.getEmail());
+
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
