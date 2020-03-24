@@ -40,6 +40,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -109,12 +110,10 @@ public class MainHomePageActivity extends AppCompatActivity {
 
     private void insertBoard(final String name, String type) {
 
-        Map<String, Object> boardsMembers = new HashMap<>();
-        boardsMembers.put(FirebaseAuth.getInstance().getCurrentUser().getUid(), null);
         Map<String, Object> board = new HashMap<>();
         board.put("Name", name);
         board.put("Type", type);
-        board.put("Members", boardsMembers);
+        board.put("Members", Arrays.asList(FirebaseAuth.getInstance().getCurrentUser().getUid()));
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 

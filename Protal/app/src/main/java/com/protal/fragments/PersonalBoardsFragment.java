@@ -83,7 +83,6 @@ public class PersonalBoardsFragment extends Fragment {
 
         final CollectionReference BoardIDRef = db.collection("Users").document(
                 FirebaseAuth.getInstance().getCurrentUser().getUid()).collection("Boards");
-        final CollectionReference BoardsRef = db.collection("Boards");
 
         BoardIDRef.addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
@@ -92,40 +91,24 @@ public class PersonalBoardsFragment extends Fragment {
                 if (e != null) {
                     return;
                 }
-                // fetch all boards id
-                if (queryDocumentSnapshots != null) {
-                    BoardIdList.clear();
-                    for (QueryDocumentSnapshot documents : queryDocumentSnapshots){
-                        if(!documents.getBoolean("Archived"))
-                            BoardIdList.add(documents.getId());
-                    }
-                    // get name of users boards
-                    db.runTransaction(new Transaction.Function<List<String>>() {
-                        @Nullable
-                        @Override
-                        public List<String> apply(@NonNull Transaction transaction)
-                                throws FirebaseFirestoreException {
-
-                            DocumentSnapshot snapshot;
-                            List<String> temp = new ArrayList<>();
-                            for(String id : BoardIdList) {
-                                snapshot=transaction.get(BoardsRef.document(id));
-                                if(snapshot.getString("Type").equals("Personal"))
-                                    temp.add(snapshot.getString("Name"));
+                // get name of users boards
+                db.collectionGroup("Boards").whereEqualTo("Type", "Personal")
+                        .whereArrayContains("Members", FirebaseAuth.getInstance()
+                                .getCurrentUser().getUid()).get()
+                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                if(task.isSuccessful()) {
+                                    BoardNamesList.clear();
+                                    for (QueryDocumentSnapshot snapshot:task.getResult()){
+                                        BoardNamesList.add(snapshot.getString("Name"));
+                                        BoardIdList.add(snapshot.getId());
+                                    }
+                                    listAdapter.notifyDataSetChanged();
+                                    pbLoadingPersonalBoards.setVisibility(View.GONE);
+                                }
                             }
-                            return temp;
-                        }
-                    })
-                    .addOnSuccessListener(new OnSuccessListener<List<String>>() {
-                        @Override
-                        public void onSuccess(List<String> stringList) {
-                            BoardNamesList.clear();
-                                BoardNamesList.addAll(stringList);
-                            listAdapter.notifyDataSetChanged();
-                            pbLoadingPersonalBoards.setVisibility(View.GONE);
-                        }
-                    });
-                }
+                        });
             }
         });
     }

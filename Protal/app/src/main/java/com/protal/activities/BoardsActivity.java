@@ -10,6 +10,7 @@ import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import androidx.annotation.NonNull;
@@ -28,10 +29,12 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
@@ -55,6 +58,8 @@ public class BoardsActivity extends AppCompatActivity {
     private BoardView mBoardView;
     Map<String, List<Map<String, String>>> lists = new HashMap<>();
     private static int sCreatedItems = 0;
+    String BoardID;
+    ProgressBar pbLoadingBoard;
 
     //TODO: add new card by clicking header
 
@@ -66,6 +71,9 @@ public class BoardsActivity extends AppCompatActivity {
         toolbar.setTitle(getIntent().getStringExtra("name"));
         setSupportActionBar(toolbar);
 
+        BoardID = getIntent().getStringExtra("id");
+
+        pbLoadingBoard = findViewById(R.id.pbLoadingBoard);
         mBoardView = findViewById(R.id.board_view);
         mBoardView.setSnapToColumnsWhenScrolling(true);
         mBoardView.setSnapToColumnWhenDragging(true);
@@ -74,7 +82,6 @@ public class BoardsActivity extends AppCompatActivity {
         mBoardView.setColumnSnapPosition(BoardView.ColumnSnapPosition.CENTER);
         mBoardView.clearBoard();
         mBoardView.setCustomDragItem(new MyDragItem(this, R.layout.column_item));
-//        mBoardView.setCustomColumnDragItem(new MyColumnDragItem(this, R.layout.column_drag_layout));
 
         mBoardView.setBoardListener(new BoardView.BoardListener() {
             @Override
@@ -84,17 +91,21 @@ public class BoardsActivity extends AppCompatActivity {
 
             @Override
             public void onItemDragEnded(int fromColumn, int fromRow, int toColumn, int toRow) {
-
+                if(fromColumn!=toColumn){
+                    pbLoadingBoard.setVisibility(View.VISIBLE);
+                    String toListName = lists.keySet().toArray()[toColumn].toString();
+                    String fromListName = lists.keySet().toArray()[fromColumn].toString();
+                    switchCard(lists.get(fromListName).get(fromRow).get("title"), toListName,
+                            fromListName, lists.get(fromListName).get(fromRow).get("id"));
+                }
             }
 
             @Override
             public void onItemChangedPosition(int oldColumn, int oldRow, int newColumn, int newRow) {
-
             }
 
             @Override
             public void onItemChangedColumn(int oldColumn, int newColumn) {
-                //TODO: change column in server
             }
 
             @Override
@@ -118,12 +129,34 @@ public class BoardsActivity extends AppCompatActivity {
             }
         });
 
-        getLists(getIntent().getStringExtra("id"));
+        getLists();
     }
 
-    private void getLists(final String id) {
+    private void switchCard(final String cardName, final String ListName, final String fromListName, final String id) {
+
+        FirebaseFirestore.getInstance().collection("Boards").document(BoardID)
+                .collection("Lists").document(fromListName).collection("Cards")
+                .document(id).delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+//                        pbLoadingBoard.setVisibility(View.GONE);
+                        insertCard(cardName, ListName);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(BoardsActivity.this, e.getLocalizedMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void getLists() {
+        pbLoadingBoard.setVisibility(View.VISIBLE);
         final FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("Boards").document(id)
+        db.collection("Boards").document(BoardID)
                 .collection("Lists").addSnapshotListener(new EventListener<QuerySnapshot>() {
             @Override
             public void onEvent(@Nullable final QuerySnapshot queryDocumentSnapshots, @Nullable FirebaseFirestoreException e) {
@@ -141,7 +174,7 @@ public class BoardsActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         System.out.println(task.getResult());
                         for (QueryDocumentSnapshot d: task.getResult()) {
-                            if(d.getReference().getPath().contains(id)) {
+                            if(d.getReference().getPath().contains(BoardID)) {
                                 String ListName = d.getReference().getPath().split("/")[3];
                                 Map<String, String> m = new HashMap<>();
                                 m.put("id", d.getId());
@@ -154,31 +187,6 @@ public class BoardsActivity extends AppCompatActivity {
                         lists = createLists(lists);
                     }
                 });
-                //TODO: DELETE
-//                final Map<String, Object> temp = new HashMap<>();
-//                for (final String ListName : lists.keySet()) {
-//                    db.collection("Boards").document(id).collection("Lists")
-//                            .document(ListName).collection("Cards").get()
-//                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                                @Override
-//                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                                    if(task.isSuccessful()){
-//                                        List<Map<String, String>> temp1 = new ArrayList<>();
-//
-//                                        for (QueryDocumentSnapshot snapshot1: task.getResult()){
-//                                            Map<String, String> m = new HashMap<>();
-//                                            m.put("id", snapshot1.getId());
-//                                            m.put("title", snapshot1.getString("title"));
-//                                            temp1.add(m);
-//                                        }
-//                                        temp.put(ListName, temp1);
-//                                        lists.clear();
-//                                        lists.putAll(temp);
-//                                        Log.d("Debugggingggg", lists.toString());
-//                                    }
-//                                }
-//                            });
-//                }
             }
         });
     }
@@ -192,6 +200,7 @@ public class BoardsActivity extends AppCompatActivity {
             addColumn(m.getKey(), m.getValue());
         }
         addColumn("Add New", null);
+        pbLoadingBoard.setVisibility(View.GONE);
         return sortedMap;
     }
 
@@ -210,29 +219,49 @@ public class BoardsActivity extends AppCompatActivity {
         header.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                //TODO: will open a dialog for name
                 LayoutInflater li = LayoutInflater.from(BoardsActivity.this);
-                View dialogView = li.inflate(R.layout.dialog_get_card_name, null);
-
-                final EditText etAddCardDialogName = dialogView.findViewById(R.id.etAddCardDialogName);
-
                 AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(BoardsActivity.this);
-                alertDialogBuilder.setView(dialogView);
-                alertDialogBuilder
-                        .setCancelable(true)
-                        .setPositiveButton("Add", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // Get user input and set it to result
-                                if(!etAddCardDialogName.getText().toString().trim().isEmpty()) {
-                                    insertCard(etAddCardDialogName.getText().toString(),
-                                            lists.keySet().toArray()[mBoardView.getColumnOfHeader(v)].toString());
-                                    long id2 = mItemArray.size();
-                                    Pair item = new Pair<>(id2, etAddCardDialogName.getText().toString());
-                                    mBoardView.addItem(mBoardView.getColumnOfHeader(v), 0, item, true);
+
+                if(mBoardView.getColumnOfHeader(v)==lists.size()){
+                    View dialogView = li.inflate(R.layout.dialog_get_list_name, null);
+                    final EditText etAddListDialogName = dialogView.findViewById(R.id.etAddListDialogName);
+                    alertDialogBuilder.setView(dialogView);
+                    alertDialogBuilder
+                            .setCancelable(true)
+                            .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    if(!etAddListDialogName.getText().toString().trim().isEmpty()){
+                                        FirebaseFirestore.getInstance().collection("Boards")
+                                                .document(BoardID)
+                                                .collection("Lists")
+                                                .document(etAddListDialogName.getText().toString())
+                                                .set(new HashMap<>());
+                                    }
                                 }
-                            }
-                        }).create()
-                        .show();
+                            }).create()
+                            .show();
+                }else {
+                    View dialogView = li.inflate(R.layout.dialog_get_card_name, null);
+                    final EditText etAddCardDialogName = dialogView.findViewById(R.id.etAddCardDialogName);
+                    alertDialogBuilder.setView(dialogView);
+                    alertDialogBuilder
+                            .setCancelable(true)
+                            .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int id) {
+                                    // Get user input and set it to result
+                                    if (!etAddCardDialogName.getText().toString().trim().isEmpty()) {
+                                        pbLoadingBoard.setVisibility(View.VISIBLE);
+                                        insertCard(etAddCardDialogName.getText().toString(),
+                                                lists.keySet().toArray()[mBoardView.getColumnOfHeader(v)].toString());
+                                        long id2 = mItemArray.size();
+                                        Pair item = new Pair<>(id2, etAddCardDialogName.getText().toString());
+                                        mBoardView.addItem(mBoardView.getColumnOfHeader(v), 0, item, true);
+                                    }
+                                }
+                            }).create()
+                            .show();
+                }
             }
         });
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -248,20 +277,22 @@ public class BoardsActivity extends AppCompatActivity {
     }
 
     private void insertCard(final String cardName, String ListName) {
-        FirebaseFirestore.getInstance().collection("Boards").document(
-                getIntent().getStringExtra("id")).collection("Lists")
-                .document(ListName).collection("Cards")
+        FirebaseFirestore.getInstance().collection("Boards").document(BoardID)
+                .collection("Lists").document(ListName).collection("Cards")
                 .add(new HashMap<String, String>(){{put("title", cardName);}})
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        getLists();
+                        pbLoadingBoard.setVisibility(View.GONE);
+                    }
+                })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(BoardsActivity.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-    }
-
-    private void add_to_database(String name) {
-
     }
 
 

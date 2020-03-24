@@ -32,10 +32,14 @@
         android:textColor="@android:color/white"
         android:visibility="gone"/>
 
-    <RelativeLayout
-        android:id="@+id/rlFragmentHome"
-        android:layout_width="match_parent"
+    <ScrollView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tvNameHome"/>
+        android:layout_below="@id/tvNameHome">
+        <RelativeLayout
+            android:id="@+id/rlFragmentHome"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </ScrollView>
 
 </RelativeLayout>
